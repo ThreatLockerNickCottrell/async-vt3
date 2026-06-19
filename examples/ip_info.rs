@@ -5,16 +5,16 @@ use async_vt3::{
 
 #[tokio::main]
 async fn main() {
-    let api_key = match std::env::args().nth(1).ok_or("Please provide the api key!") {
+    let api_key = match std::env::args().next().and_then(|s| s.parse().ok()).ok_or("Please provide the api key!") {
         Ok(api_key) => api_key,
         Err(e) => {
             println!("{:?}", e);
             std::process::exit(1)
         }
     };
-    let ip_address = "5.2.69.42";
+    let ip_address = "5.2.69.42".parse().unwrap();
 
-    let res = VtClient::new(&api_key)
+    let res = VtClient::new(api_key)
         .user_agent("Chrome for Windows")
         .ip_info(ip_address)
         .await;
@@ -23,7 +23,7 @@ async fn main() {
         Err(e) => println!("Error: {}", e),
     }
 
-    let client = VtClient::new(&api_key).user_agent("Chrome_For_Windows");
+    let client = VtClient::new(api_key).user_agent("Chrome_For_Windows");
 
     // Add comment to an ip_addres
     let attrs = CommentAttributes::new(

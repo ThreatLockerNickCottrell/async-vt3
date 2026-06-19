@@ -2,7 +2,7 @@ use async_vt3::VtClient;
 
 #[tokio::main]
 async fn main() {
-    let api_key = match std::env::args().nth(1).ok_or("Please provide the api key!") {
+    let api_key = match std::env::args().next().and_then(|s| s.parse().ok()).ok_or("Please provide the api key!") {
         Ok(api_key) => api_key,
         Err(e) => {
             println!("{:?}", e);
@@ -10,7 +10,7 @@ async fn main() {
         }
     };
 
-    let res = VtClient::new(&api_key)
+    let res = VtClient::new(api_key)
         .get_comments(Some("10"), Some("tag:malware"), None)
         .await;
     match res {

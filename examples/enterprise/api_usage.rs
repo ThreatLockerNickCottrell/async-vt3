@@ -4,7 +4,7 @@ use async_vt3::VtClient;
 async fn main() {
     let mut args = std::env::args().skip(1);
     let api_key = match args
-        .next()
+        .next().and_then(|s| s.parse().ok())
         .ok_or("Please provide the api key as 1st argument!")
     {
         Ok(api_key) => api_key,
@@ -25,7 +25,7 @@ async fn main() {
         }
     };
 
-    let res = VtClient::new(&api_key)
+    let res = VtClient::new(api_key)
         .api_usage(&user_id, Some("20210618"), Some("20210620"))
         .await;
     match res {
