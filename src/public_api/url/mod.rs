@@ -7,7 +7,7 @@ use crate::{
 };
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn url_scan(&self, resource_url: &str) -> VtResult<ScanRoot> {
         //! Scan an URL
         //!
@@ -21,7 +21,7 @@ impl VtClient {
         //! println!("{:?}", vt.url_scan(url).await);
         //! # })
         //! ```
-        let url = format!("{}/urls", &self.endpoint);
+        let url = format!("{}/urls", self.endpoint);
         let form_data = &[("public_api.url", resource_url)];
         http_post(&self.api_key, &self.user_agent, &url, form_data).await
     }

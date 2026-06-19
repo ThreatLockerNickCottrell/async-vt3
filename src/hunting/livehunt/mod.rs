@@ -7,7 +7,7 @@ use crate::{
     VtClient, VtResult,
 };
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn get_rulesets(
         &self,
         limit: Option<&str>,

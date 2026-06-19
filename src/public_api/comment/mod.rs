@@ -8,7 +8,7 @@ use crate::{
     VtClient, VtResult,
 };
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn get_comments(
         self,
         limit: Option<&str>,

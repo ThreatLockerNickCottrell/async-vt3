@@ -12,7 +12,7 @@ use crate::{
     VtClient, VtResult,
 };
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn file_info(&self, id: &str) -> VtResult<Root> {
         //! Retrieve public_api.file scan reports
         //! id: SHA-256, SHA-1 or MD5 identifying the public_api.file

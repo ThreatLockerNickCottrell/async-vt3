@@ -2,7 +2,7 @@ use reqwest::{multipart::Form, Client, Response, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::VtResult;
+use crate::{ApiKey, VtResult};
 
 /// Process a regular reqwest response
 #[inline]
@@ -52,14 +52,14 @@ where
 }
 
 /// GET from a URL
-pub(crate) async fn http_get<T>(api_key: &str, user_agent: &str, url: &str) -> VtResult<T>
+pub(crate) async fn http_get<T>(api_key: &ApiKey, user_agent: &str, url: &str) -> VtResult<T>
 where
     T: DeserializeOwned,
 {
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .get(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .header("Accept", "application/json")
         .send()
         .await?;
@@ -68,14 +68,18 @@ where
 
 /// GET from a URL with bzipped response
 #[cfg(feature = "feeds")]
-pub(crate) async fn http_get_bz<T>(api_key: &str, user_agent: &str, url: &str) -> VtResult<Vec<T>>
+pub(crate) async fn http_get_bz<T>(
+    api_key: &ApiKey,
+    user_agent: &str,
+    url: &str,
+) -> VtResult<Vec<T>>
 where
     T: DeserializeOwned,
 {
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .get(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .header("Accept", "application/json")
         .send()
         .await?;
@@ -84,7 +88,7 @@ where
 
 /// GET from a URL with query params
 pub(crate) async fn http_get_with_params<T>(
-    api_key: &str,
+    api_key: &ApiKey,
     user_agent: &str,
     url: &str,
     query_params: &[(&str, &str)],
@@ -95,7 +99,7 @@ where
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .get(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .header("Accept", "application/json")
         .query(query_params)
         .send()
@@ -105,7 +109,7 @@ where
 
 /// POST to a URL
 pub(crate) async fn http_post<T>(
-    api_key: &str,
+    api_key: &ApiKey,
     user_agent: &str,
     url: &str,
     form_data: &[(&str, &str)],
@@ -116,7 +120,7 @@ where
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .post(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .form(form_data)
         .send()
         .await?;
@@ -125,7 +129,7 @@ where
 
 /// POST to a URL with multipart form_data
 pub(crate) async fn http_multipart_post<T>(
-    api_key: &str,
+    api_key: &ApiKey,
     user_agent: &str,
     url: &str,
     form_data: Form,
@@ -136,7 +140,7 @@ where
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .post(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .multipart(form_data)
         .send()
         .await?;
@@ -145,7 +149,7 @@ where
 
 /// POST to a URL with data in the body
 pub(crate) async fn http_body_post<S, T>(
-    api_key: &str,
+    api_key: &ApiKey,
     user_agent: &str,
     url: &str,
     data: S,
@@ -157,7 +161,7 @@ where
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .post(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .json(&data)
         .send()
         .await?;
@@ -165,14 +169,14 @@ where
 }
 
 /// DELETE
-pub(crate) async fn http_delete<T>(api_key: &str, user_agent: &str, url: &str) -> VtResult<T>
+pub(crate) async fn http_delete<T>(api_key: &ApiKey, user_agent: &str, url: &str) -> VtResult<T>
 where
     T: DeserializeOwned,
 {
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .delete(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .send()
         .await?;
     process_resp(resp).await
@@ -181,7 +185,7 @@ where
 /// PATCH
 #[cfg(feature = "hunting")]
 pub(crate) async fn http_patch<S, T>(
-    api_key: &str,
+    api_key: &ApiKey,
     user_agent: &str,
     url: &str,
     data: S,
@@ -193,7 +197,7 @@ where
     let client = Client::builder().user_agent(user_agent).build()?;
     let resp = client
         .patch(url)
-        .header("x-apikey", api_key)
+        .header("x-apikey", api_key.to_string())
         .json(&data)
         .send()
         .await?;

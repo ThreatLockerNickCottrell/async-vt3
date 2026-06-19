@@ -3,7 +3,7 @@ use response::Root;
 
 use crate::{utils::http_get, VtClient, VtResult};
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn domain_info(&self, domain: &str) -> VtResult<Root> {
         //! Get the report of a given Domain
         //!

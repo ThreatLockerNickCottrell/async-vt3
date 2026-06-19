@@ -29,18 +29,22 @@ static DEFAULT_USER_AGENT: &str = "rust-client/vt3+https://github.com/marirs/vt3
 pub mod error;
 mod utils;
 
+mod api_key;
+pub use crate::api_key::ApiKey;
+
 use error::VtError;
 pub type VtResult<T> = Result<T, VtError>;
 
+const API_ENDPOINT: &'static str = "https://www.virustotal.com/api/v3";
 #[derive(Clone)]
-pub struct VtClient {
-    api_key: String,
-    endpoint: String,
-    user_agent: String,
+pub struct VtClient<'a> {
+    api_key: ApiKey,
+    endpoint: &'a str,
+    user_agent: &'a str,
 }
 
-impl VtClient {
-    pub fn new(api_key: &str) -> Self {
+impl<'a> VtClient<'a> {
+    pub const fn new(api_key: ApiKey) -> Self {
         //! Creates a new VirusTotal API Client to access the VirusTotal REST API v3
         //!
         //! ## Example usage
@@ -50,27 +54,28 @@ impl VtClient {
         //! let vt_client = VtClient::new("YOUR API KEY");
         //! ```
         VtClient {
-            api_key: api_key.into(),
-            endpoint: "https://www.virustotal.com/api/v3".into(),
-            user_agent: DEFAULT_USER_AGENT.into(),
+            api_key: api_key,
+            endpoint: API_ENDPOINT,
+            user_agent: DEFAULT_USER_AGENT,
         }
     }
 
     /// Sets a new user-agent that from the default
-    pub fn user_agent(mut self, user_agent: &str) -> VtClient {
-        self.user_agent = user_agent.into();
-        self
+    pub fn user_agent<'b: 'a>(self, user_agent: &'a str) -> VtClient {
+        Self { user_agent, ..self }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::VtClient;
+    use crate::ApiKey;
+
+use super::VtClient;
 
     #[test]
     fn test_vtclient() {
-        let vt_client = VtClient::new("someapikey");
-        assert_eq!(vt_client.api_key, "someapikey");
+        let vt_client = VtClient::new(ApiKey::default());
+        assert_eq!(vt_client.api_key, "000000000000000000000000000000000000000000000000000000000000000");
         assert_eq!(vt_client.endpoint, "https://www.virustotal.com/api/v3")
     }
 }

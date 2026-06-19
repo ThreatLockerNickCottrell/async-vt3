@@ -6,7 +6,7 @@ use crate::{
     VtClient, VtResult,
 };
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn user_info(&self, id: &str) -> VtResult<UserRoot> {
         //! Retrieve user information.
         //!

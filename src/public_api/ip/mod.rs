@@ -19,7 +19,7 @@ use crate::{
     VtClient, VtResult,
 };
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn ip_info(&self, ip_address: &str) -> VtResult<Root> {
         //! Get the report of a given IP Address
         //!
@@ -50,8 +50,8 @@ impl VtClient {
         //! ```
         let url = format!("{}/ip_addresses/{}/comments", &self.endpoint, ip_address);
         http_get(
-            self.api_key.as_str(),
-            self.user_agent.as_str(),
+            &self.api_key,
+            self.user_agent,
             url.as_str(),
         )
         .await
@@ -84,8 +84,8 @@ impl VtClient {
         let url = format!("{}/ip_addresses/{}/comments", &self.endpoint, ip_address);
         let body = create_comment_req(attrs);
         http_body_post(
-            self.api_key.as_str(),
-            self.user_agent.as_str(),
+            &self.api_key,
+            self.user_agent,
             url.as_str(),
             body,
         )
@@ -109,15 +109,15 @@ impl VtClient {
         //! ```
         let url = format!(
             "{}/ip_addresses/{}/{}",
-            self.endpoint.as_str(),
+            self.endpoint,
             ip_address,
             relationship,
         );
         match relationship {
             Relationships::Comments | Relationships::RelatedComments => {
                 let comments: Comments = http_get(
-                    self.api_key.as_str(),
-                    self.user_agent.as_str(),
+                    &self.api_key,
+                    self.user_agent,
                     url.as_str(),
                 )
                 .await?;
@@ -127,8 +127,8 @@ impl VtClient {
             | Relationships::DownloadedFiles
             | Relationships::ReferrerFiles => {
                 let files: VtFiles = http_get(
-                    self.api_key.as_str(),
-                    self.user_agent.as_str(),
+                    &self.api_key,
+                    self.user_agent,
                     url.as_str(),
                 )
                 .await?;
@@ -154,13 +154,13 @@ impl VtClient {
         //! ```
         let url = format!(
             "{}/ip_addresses/{}/relationships/{}",
-            self.endpoint.as_str(),
+            self.endpoint,
             ip_address,
             relationship
         );
         http_get(
-            self.api_key.as_str(),
-            self.user_agent.as_str(),
+            &self.api_key,
+            self.user_agent,
             url.as_str(),
         )
         .await
@@ -179,12 +179,12 @@ impl VtClient {
         //! ```
         let url = format!(
             "{}/ip_addresses/{}/votes",
-            self.endpoint.as_str(),
+            self.endpoint,
             ip_address
         );
         http_get(
-            self.api_key.as_str(),
-            self.user_agent.as_str(),
+            &self.api_key,
+            self.user_agent,
             url.as_str(),
         )
         .await
@@ -193,13 +193,13 @@ impl VtClient {
     pub async fn create_ip_vote(&self, ip_address: &str, attrs: VoteAttributes) -> VtResult<Vote> {
         let url = format!(
             "{}/ip_addresses/{}/votes",
-            self.endpoint.as_str(),
+            self.endpoint,
             ip_address
         );
         let req = create_vote_req(attrs);
         http_body_post(
-            self.api_key.as_str(),
-            self.user_agent.as_str(),
+            &self.api_key,
+            self.user_agent,
             url.as_str(),
             req,
         )

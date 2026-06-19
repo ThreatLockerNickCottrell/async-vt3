@@ -3,7 +3,7 @@ use response::Root;
 
 use crate::{utils::http_get_bz, VtClient, VtResult};
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn file_feed(&self, time: &str) -> VtResult<Vec<Root>> {
         //! Get a file feed batch.
         //!

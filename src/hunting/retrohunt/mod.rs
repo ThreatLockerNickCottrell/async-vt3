@@ -7,7 +7,7 @@ use crate::{
     VtClient, VtResult,
 };
 
-impl VtClient {
+impl VtClient<'_> {
     pub async fn get_retrohunt_jobs(
         &self,
         limit: Option<&str>,
