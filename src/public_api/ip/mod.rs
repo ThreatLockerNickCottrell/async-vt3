@@ -2,6 +2,8 @@ mod model;
 mod request;
 mod response;
 
+use std::net::IpAddr;
+
 pub use super::comment::CommentAttributes;
 use super::comment::{Comment, Comments};
 
@@ -20,7 +22,7 @@ use crate::{
 };
 
 impl VtClient<'_> {
-    pub async fn ip_info(&self, ip_address: &str) -> VtResult<Root> {
+    pub async fn ip_info(&self, ip_address: IpAddr) -> VtResult<Root> {
         //! Get the report of a given IP Address
         //!
         //! ## Example Usage
@@ -36,7 +38,7 @@ impl VtClient<'_> {
         http_get(&self.api_key, &self.user_agent, &url).await
     }
 
-    pub async fn ip_comments(&self, ip_address: &str) -> VtResult<Comments> {
+    pub async fn ip_comments(&self, ip_address: IpAddr) -> VtResult<Comments> {
         //! Get the comments from an ip address
         //!
         //! ## Example Usage
@@ -59,7 +61,7 @@ impl VtClient<'_> {
 
     pub async fn add_ip_comment(
         &self,
-        ip_address: &str,
+        ip_address: IpAddr,
         attrs: CommentAttributes,
     ) -> VtResult<Comment> {
         //! Get the comments from an ip address
@@ -94,7 +96,7 @@ impl VtClient<'_> {
 
     pub async fn list_ip_related_objects(
         &self,
-        ip_address: &str,
+        ip_address: IpAddr,
         relationship: Relationships,
     ) -> VtResult<RelatedObjects> {
         //! List related objects of an ip address
@@ -139,7 +141,7 @@ impl VtClient<'_> {
 
     pub async fn list_ip_related_ids(
         &self,
-        ip_address: &str,
+        ip_address: IpAddr,
         relationship: Relationships,
     ) -> VtResult<RelatedCollections> {
         //! List related ids of an ip address
@@ -166,7 +168,7 @@ impl VtClient<'_> {
         .await
     }
 
-    pub async fn list_ip_votes(&self, ip_address: &str) -> VtResult<Votes> {
+    pub async fn list_ip_votes(&self, ip_address: IpAddr) -> VtResult<Votes> {
         //! List votes for an ip address
         //!
         //! ## Example Usage
@@ -190,7 +192,7 @@ impl VtClient<'_> {
         .await
     }
 
-    pub async fn create_ip_vote(&self, ip_address: &str, attrs: VoteAttributes) -> VtResult<Vote> {
+    pub async fn create_ip_vote(&self, ip_address: IpAddr, attrs: VoteAttributes) -> VtResult<Vote> {
         let url = format!(
             "{}/ip_addresses/{}/votes",
             self.endpoint,

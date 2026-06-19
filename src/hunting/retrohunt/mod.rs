@@ -105,7 +105,7 @@ impl VtClient<'_> {
             "{}/intelligence/retrohunt_jobs/{}/abort",
             &self.endpoint, job_id
         );
-        let form_data = &[("id", job_id.as_str())];
+        let form_data = &[("id", job_id.to_string())];
         http_post(&self.api_key, &self.user_agent, &url, form_data).await
     }
 }

@@ -47,7 +47,7 @@ impl FromStr for ApiKey {
 
     #[inline]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        ApiKey::from_hex(s)
+        Self::from_hex(s)
     }
 }
 

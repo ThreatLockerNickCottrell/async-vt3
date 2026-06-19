@@ -112,7 +112,7 @@ pub(crate) async fn http_post<T>(
     api_key: &ApiKey,
     user_agent: &str,
     url: &str,
-    form_data: &[(&str, &str)],
+    form_data: &[(&str, String)],
 ) -> VtResult<T>
 where
     T: DeserializeOwned,

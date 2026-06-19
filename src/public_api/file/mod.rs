@@ -1,5 +1,5 @@
 use reqwest::multipart::{Form, Part};
-use std::{fs::File, io::Read};
+use std::{ffi::OsStr, fs::File, io::Read, path::Path};
 
 mod response;
 use response::{Attributes, Root, ScanRoot};
@@ -8,12 +8,14 @@ mod model;
 pub use model::VtFiles;
 
 use crate::{
+    error::VtError,
+    public_api::file::model::Hash,
     utils::{http_get, http_multipart_post, http_post},
     VtClient, VtResult,
 };
 
 impl VtClient<'_> {
-    pub async fn file_info(&self, id: &str) -> VtResult<Root> {
+    pub async fn file_info(&self, id: Hash) -> VtResult<Root> {
         //! Retrieve public_api.file scan reports
         //! id: SHA-256, SHA-1 or MD5 identifying the public_api.file
         //!
@@ -28,7 +30,7 @@ impl VtClient<'_> {
         http_get(&self.api_key, &self.user_agent, &url).await
     }
 
-    pub async fn file_scan(&self, file: &str) -> VtResult<ScanRoot> {
+    pub async fn file_scan<P: AsRef<Path>>(&self, file: P) -> VtResult<ScanRoot> {
         //! Upload and scan a public_api.file
         //!
         //! ## Example Usage
@@ -40,17 +42,25 @@ impl VtClient<'_> {
         //! println!("{:?}", vt.file_scan("data/eicar.com.txt").await);
         //! # })
         //! ```
-        let mut f = File::open(file)?;
+        let mut f = File::open(file.as_ref())?;
         let mut buffer = Vec::new();
         {
             f.read_to_end(&mut buffer)?;
         }
-        let form_data = Form::new().part("file", Part::bytes(buffer).file_name(file.to_owned()));
+        let form_data = Form::new().part(
+            "file",
+            Part::bytes(buffer).file_name(
+                file.as_ref()
+                    .file_name()
+                    .and_then(|s| s.to_os_string().into_string().ok())
+                    .ok_or(VtError::InvalidArgumentError)?,
+            ),
+        );
         let url = format!("{}/files", &self.endpoint);
         http_multipart_post(&self.api_key, &self.user_agent, &url, form_data).await
     }
 
-    pub async fn file_rescan(&self, id: &str) -> VtResult<ScanRoot> {
+    pub async fn file_rescan(&self, id: Hash) -> VtResult<ScanRoot> {
         //! Re-submit/Re-scan already submitted files
         //! id: SHA-256, SHA-1 or MD5 identifying the public_api.file
         //!
@@ -62,7 +72,7 @@ impl VtClient<'_> {
         //! vt.file_rescan("44d88612fea8a8f36de82e1278abb02f");
         //! ```
         let url = format!("{}/files/{}/analyse", &self.endpoint, id);
-        let form_data = &[("id", id)];
+        let form_data = &[("id", id.to_string())];
         http_post(&self.api_key, &self.user_agent, &url, form_data).await
     }
 }

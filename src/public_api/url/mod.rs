@@ -22,7 +22,7 @@ impl VtClient<'_> {
         //! # })
         //! ```
         let url = format!("{}/urls", self.endpoint);
-        let form_data = &[("public_api.url", resource_url)];
+        let form_data = &[("public_api.url", resource_url.to_string())];
         http_post(&self.api_key, &self.user_agent, &url, form_data).await
     }
 
@@ -42,7 +42,7 @@ impl VtClient<'_> {
         //! ```
         let url_id = resource_id.split('-').nth(1).unwrap_or(resource_id);
         let url = format!("{}/urls/{}/analyse", &self.endpoint, url_id);
-        let form_data = &[("public_api.url", resource_id)];
+        let form_data = &[("public_api.url", resource_id.to_string())];
         http_post(&self.api_key, &self.user_agent, &url, form_data).await
     }
 
